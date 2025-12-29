@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STE & Technical English Quiz</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        header {
+            text-align: center;
+            border-bottom: 2px solid #eef2f5;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        h1 {
+            color: #1a73e8;
+            font-size: 24px;
+            margin: 0;
+        }
+        .question-block {
+            background-color: #fff;
+            border: 1px solid #dfe1e5;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: box-shadow 0.2s;
+        }
+        .question-block:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .question-header {
+            font-weight: bold;
+            color: #5f6368;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .question-text {
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .option-label {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .option-label:hover {
+            background-color: #f1f3f4;
+            border-color: #dadce0;
+        }
+        .option-label input[type="radio"] {
+            margin-right: 15px;
+            transform: scale(1.2);
+            accent-color: #1a73e8;
+        }
+        
+        /* Correction Styles */
+        .correct {
+            background-color: #e6f4ea !important;
+            border-color: #34a853 !important;
+            color: #137333;
+        }
+        .incorrect {
+            background-color: #fce8e6 !important;
+            border-color: #ea4335 !important;
+            color: #c5221f;
+        }
+        .feedback-icon {
+            margin-left: auto;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .controls {
+            margin-top: 30px;
+            text-align: center;
+        }
+        .submit-btn {
+            background-color: #1a73e8;
+            color: white;
+            font-size: 18px;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(26, 115, 232, 0.3);
+            transition: background 0.3s;
+            font-weight: bold;
+        }
+        .submit-btn:hover {
+            background-color: #1557b0;
+        }
+        
+        #result-area {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #202124;
+            color: white;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            .question-text {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>STE 2 - Exam Questions</h1>
+    </header>
+
+    <div id="quiz-container">
+        </div>
+
+    <div class="controls">
+        <button class="submit-btn" onclick="submitQuiz()">Submit / تصحيح</button>
+    </div>
+
+    <div id="result-area"></div>
+</div>
+
+<script>
+    // Data extracted exactly from the file content provided
+    // 0=A/True, 1=B/False, 2=C, 3=D
+    const quizData = [
+        // --- Course Description ---
+        {
+            q: "What is the fundamental principle that the student must adopt to achieve the greatest benefit from the course?",
+            options: ["Relying mainly on the lecturer.", "Recruiting a colleague for study help.", "Relying on himself as much as possible.", "Relying on external resources without attending lectures."],
+            a: 2
+        },
+        {
+            q: "What modern technology tool is the student advised to use as part of their self-study efforts to master pronunciation?",
+            options: ["A specialized calculator.", "A project management platform.", "Google Translate.", "A video editing program."],
+            a: 2
+        },
+        // --- Math Section ---
+        {
+            q: "Mathematics ______ wherever people think about the physical world or about the world of ideas.",
+            options: ["arise", "arises", "is arise", "are arising"],
+            a: 1
+        },
+        {
+            q: "What are the four basic components of mathematics?",
+            options: ["Algebra, statistics, logic, and geometry", "Arithmetic, geometry, algebra, and mathematical reasoning", "Calculus, probability, complex analysis, and mathematical logic", "Arithmetic, topology, geometry, and statistics"],
+            a: 1
+        },
+        {
+            q: "What is meant by continuity in mathematics?",
+            options: ["A function that changes its direction frequently.", "A function that changes smoothly without any jumps or breaks.", "A function that has sharp corners or cusps.", "A function that repeats its values after equal intervals."],
+            a: 1
+        },
+        {
+            q: "What is the main difference between pure mathematics and applied mathematics?",
+            options: ["Pure mathematics deals with logical relations, while applied mathematics uses them in real situations.", "Applied mathematics is easier than pure mathematics.", "Pure mathematics is about numbers, while applied Mathematics is about letters.", "There is no difference between them."],
+            a: 0
+        },
+        {
+            q: "Which of the following works inspired many classic treatises of modern mathematics, such as Newton's Principia Mathematica?",
+            options: ["Principia Mathematica", "Elements", "Almagest", "On the Sphere and Cylinder"],
+            a: 1
+        },
+        {
+            q: "What is the main difference between modern logic and ordinary thinking?",
+            options: ["Modern logic depends on emotional connections.", "Modern logic separates implication from cause.", "Ordinary thinking always uses mathematics.", "Modern logic is based only on experiments."],
+            a: 1
+        },
+        {
+            q: "What is the name of the problem that involves tracing a figure without repeating any strokes and without lifting the finger from the ground?",
+            options: ["The Four-Color Problem", "The Repetitive Geometry Problem", "The Unicursal Tracing Problem", "The Double Bridge Problem"],
+            a: 2
+        },
+        {
+            q: "Which of the following statements best explains the influence of Euclid's Elements according to the passage?",
+            options: ["It was the first work to introduce calculus in ancient Greece.", "It established the logical and formal structure that inspired later Greek mathematicians and modern works such as Newton's Principia Mathematica.", "It focused mainly on astronomy and physical sciences rather than mathematics.", "It replaced all earlier mathematical theories of ancient Greece."],
+            a: 1
+        },
+        {
+            q: "When a child starts using numbers while playing, what does this show?",
+            options: ["The child feels bored", "The child starts to understand relationships between things", "The child only likes colors", "The child cannot speak yet"],
+            a: 1
+        },
+        {
+            q: "Which type of shapes can young children (ages 3-5) distinguish more easily?",
+            options: ["A square from a circle", "An open shape from a closed shape", "A triangle from a rectangle", "A large circle from a small circle"],
+            a: 1
+        },
+        {
+            q: "Visual symbolism is considered a peculiarly human mode of thought because:",
+            options: ["It can also be observed in animals.", "It is learned naturally without teaching.", "It is unique to humans and learned through teaching.", "It only appears in ancient artifacts."],
+            a: 2
+        },
+        {
+            q: "What made the American system of measurement different from the metric system?",
+            options: ["Because the Americans invented a new, more accurate system.", "Because the American system relies on old, non-decimal counting systems.", "Because the American system is derived from the modern French system.", "Because the American system uses units based on the decimal system."],
+            a: 1
+        },
+        {
+            q: "Which statement best describes the role of numbers in mathematics and cultural development?",
+            options: ["Numbers are primarily used for accounting and have little impact on abstract mathematical concepts.", "The development of numbers is unique to each culture, with no common patterns.", "Numbers are foundational to mathematics and have shown convergent development across cultures, evolving from simple counting to abstract theory.", "Numbers are a recent invention and have not significantly influenced human thought or cultural practices."],
+            a: 2
+        },
+        {
+            q: "What did the cuneiform tablets contain?",
+            options: ["Stories about Mesopotamian kings", "Computations of volumes of solid figures", "Drawings of pyramids", "Lists of trade goods"],
+            a: 3
+        },
+        {
+            q: "What is the literal meaning of the word trigonometry?",
+            options: ["circle division", "chord calculation", "angle rotation", "triangle measurement"],
+            a: 3
+        },
+        {
+            q: "Where did the modern world get the Hindu-Arabic numeral system from?",
+            options: ["Ancient Greece", "Medieval Muslim civilization", "Ancient Egypt", "The Roman Empire"],
+            a: 1
+        },
+        {
+            q: "What was the final step in creating the Hindu-Arabic numeral system?",
+            options: ["Using letters instead of numbers", "Adding more than ten symbols", "Using a symbol for an empty place (zero)", "Changing the direction of writing numbers"],
+            a: 2
+        },
+        {
+            q: "What does the Arabic word al-jabr mean?",
+            options: ["Division or subtraction", "Completion or restoration", "Multiplication or addition", "Calculation or counting"],
+            a: 1
+        },
+        {
+            q: "What is algebra mainly about?",
+            options: ["Finding unknown numbers", "Learning new languages", "Studying history", "Drawing shapes"],
+            a: 0
+        },
+        {
+            q: "What does projective geometry study?",
+            options: ["The shapes and sizes of figures", "The relations among figures that remain constant in perspective.", "The measurement of angles", "The calculation of areas"],
+            a: 1
+        },
+        {
+            q: "What role did René Descartes play in the development of modern algebraic notation?",
+            options: ["He invented the concept of zero.", "He introduced the use of letters near the beginning of the alphabet for constants and those near the end for variables and unknowns.", "He developed the first computer algorithm.", "He discovered the Pythagorean theorem."],
+            a: 1
+        },
+        {
+            q: "Which two elementary problems are the starting point for the story of calculus once algebra enters the picture?",
+            options: ["Calculating planetary orbits and measuring light.", "Finding the hypotenuse of a right triangle and calculating volume.", "Finding tangents and calculating areas.", "Solving quadratic equations and factoring polynomials."],
+            a: 2
+        },
+        {
+            q: "(True or False) Fermat's method for finding maxima and minima was widely recognized during his lifetime because he published his work.",
+            options: ["True", "False"],
+            a: 1
+        },
+        {
+            q: "(True or False) Generating a Taylor series requires knowing the value of the function over any short time interval.",
+            options: ["True", "False"],
+            a: 0
+        },
+        {
+            q: "(True or False) Gauss believed there is an algebraic formula to solve the general quintic equation.",
+            options: ["True", "False"],
+            a: 1
+        },
+        {
+            q: "One of the ways to regard an area was as a sum of what?",
+            options: ["Sum of points", "Sum of numbers", "Sum of lines", "Sum of circles"],
+            a: 2
+        },
+        {
+            q: "In Newton's first version of calculus, what was considered the universal independent variable?",
+            options: ["Velocity", "Distance", "Time", "Acceleration"],
+            a: 2
+        },
+        {
+            q: "How were the relative rates of change of variables computed?",
+            options: ["As differences between values", "As the ratio of their rates of change with respect to time", "As the product of velocities", "As constant quantities"],
+            a: 1
+        },
+        {
+            q: "Who introduced the notation of infinitesimals, dx and dy?",
+            options: ["Newton", "Leibniz", "Archimedes", "Mencke"],
+            a: 1
+        },
+        {
+            q: "What was the main role of the followers of Newton and Leibniz?",
+            options: ["To stop the spread of calculus", "To continue developing and expanding their ideas", "To replace geometry with algebra", "To translate their works into many languages"],
+            a: 1
+        },
+        {
+            q: "What does the word 'disciples' mean?",
+            options: ["Enemies", "Followers", "Teachers", "Strangers"],
+            a: 1
+        },
+        {
+            q: "What was the general procedure used to eliminate the derivatives in the equations?",
+            options: ["Differentiating both sides", "Integrating one side", "Integrating both sides", "Differentiating only one side"],
+            a: 2
+        },
+        {
+            q: "What does topology mainly study?",
+            options: ["The measurement of distances and angles.", "The properties of space that remain unchanged under continuous transformations.", "The construction of three-dimensional shapes.", "The relationship between algebra and geometry."],
+            a: 1
+        },
+        {
+            q: "Why did some parts of calculus raise doubts among mathematicians?",
+            options: ["Because they depended on algebraic assumptions", "Because they were geometric in nature", "Because they contradicted Euclid's axioms", "Because they did not involve any drawings"],
+            a: 0
+        },
+        {
+            q: "Early mathematics said a function is continuous when...",
+            options: ["it has one clear formula", "it changes every second", "it has no rules", "it makes no sense"],
+            a: 0
+        },
+        {
+            q: "Power series helped mathematics because they...",
+            options: ["created new kinds of functions", "Broke all rules", "removed calculus", "made functions disappear"],
+            a: 0
+        },
+        {
+            q: "What do real and complex analysis both come from?",
+            options: ["Geometry only", "Calculus", "Physics", "Algebra only"],
+            a: 1
+        },
+        {
+            q: "What central mathematical concept connects both real and complex analysis?",
+            options: ["Integration", "Functions", "Equations", "Geometry"],
+            a: 1
+        },
+        {
+            q: "What is the main reason Walter Rudin wrote Real and Complex Analysis?",
+            options: ["To separate real and complex analysis completely", "To show the deep connection between real and complex analysis", "To introduce new definitions of functions", "To focus only on complex functions"],
+            a: 1
+        },
+        {
+            q: "What is interpretation of the imaginary number?",
+            options: ["The length of a line segment", "A rotation through a right angle", "The area of a geometric figure", "A rational numerical value"],
+            a: 1
+        },
+        {
+            q: "(True or False) Set theory is now considered the common language used in all areas of mathematics.",
+            options: ["True", "False"],
+            a: 0
+        },
+        {
+            q: "What is a fundamental complication that arises when we use numbers to measure continuous quantities like length or weight?",
+            options: ["The calculations become too complex for most people to perform.", "The unit of measurement is arbitrary and culturally dependent, requiring reconciliation.", "Continuous quantities cannot be divided into smaller pieces.", "Computers are unable to handle the mathematical operations involved."],
+            a: 1
+        },
+        {
+            q: "(True or False) The division of the circle into 360 degrees first began in Mesopotamia.",
+            options: ["True", "False"],
+            a: 0
+        },
+        {
+            q: "What is the main idea behind the method of prosthaphaeresis used by Pitiscus?",
+            options: ["Converting addition into multiplication to speed up calculations", "Converting multiplication into easier addition and subtraction", "Replacing trigonometric tables with logarithmic tables", "Using geometry instead of arithmetic"],
+            a: 1
+        },
+        {
+            q: "What does the word 'logarithm' mean?",
+            options: ["Ratio number", "Geometric progression", "Arithmetic proportion", "Mathematical model"],
+            a: 0
+        },
+        {
+            q: "What was the main goal of John Napier's work on logarithms?",
+            options: ["To develop a new algebraic notation system", "To simplify laborious multiplications, divisions, and root extractions", "To study the properties of geometric progressions", "To develop a new method for solving equations"],
+            a: 1
+        },
+        {
+            q: "Which of the following is one of Euclid's preserved minor works?",
+            options: ["The Republic", "The Optics", "Mechanics", "The Geometry Handbook"],
+            a: 1
+        },
+        {
+            q: "What was considered one of Archimedes' most profound achievements?",
+            options: ["Discovering a new type of triangle", "Proving that the surface of a sphere is four times its equatorial disk", "Writing ten mathematical books", "Calculating the distance between Alexandria and Syracuse"],
+            a: 1
+        },
+        {
+            q: "What can be inferred from Apollonius' account of how he composed the books of Conics?",
+            options: ["That he did not care about the quality of the work and did not plan to revise it later.", "That he wrote the books slowly and carefully revised them before giving them to Naucrates.", "That he was eager to fulfil Naucrates' request, which made him write quickly and hand the books to him before his departure.", "That he did not intend to publish or share his books with anyone."],
+            a: 2
+        },
+        {
+            q: "What can be understood from Apollonius' prefaces about the status of geometry in his era?",
+            options: ["That it was a field of limited interest studied only by specialists.", "That it was an essential part of an educated person's culture and was highly appreciated by people.", "That it was a new science that had not been known before his time.", "That it was a theoretical science that only poets and writers cared about."],
+            a: 1
+        },
+        {
+            q: "Which of the following correctly represents one of the results established by Zenodorus?",
+            options: ["A non-regular polygon can enclose a larger area than a regular polygon if they have the same perimeter and the same number of sides.", "The fewer sides a regular polygon has (with the perimeter fixed), the greater the area it encloses.", "A circle encloses the largest possible area compared to any other shape with the same perimeter.", "Euclid established most isoperimetric results before Zenodorus."],
+            a: 2
+        },
+        {
+            q: "Who is Heron of Alexandria, and what is his most notable achievement in mathematics?",
+            options: ["He was a Greek philosopher who created the first theory of gravity.", "He was an astronomer who discovered the distance between Earth and the Moon.", "He was a historian who wrote the earliest book on world civilizations.", "He was a mathematician and engineer who developed a formula to find the area of a triangle using its side lengths."],
+            a: 3
+        },
+        {
+            q: "Why did Ptolemy's Syntaxis remain influential for more than a thousand years?",
+            options: ["Because it described planets using stories and myths.", "Because it presented a complete and organized mathematical system for understanding planetary motion.", "Because it was the first book written in Arabic.", "Because it was short and easy to memorize."],
+            a: 1
+        },
+        {
+            q: "What is Pappus best known for?",
+            options: ["Inventing new tools for astronomy", "Writing the Collection containing geometric and arithmetic theorems", "Discovering the planet Saturn", "Building the city of Alexandria"],
+            a: 1
+        },
+        {
+            q: "Where did Pappus observe a solar eclipse in 320 CE?",
+            options: ["Rome", "Athens", "Alexandria", "Babylon"],
+            a: 2
+        },
+        {
+            q: "Describing the science as 'almost taking first place' in understanding the nature of material elements suggests that mechanics is:",
+            options: ["The least important science", "One of the most important sciences related to the universe", "A science related to literature", "A science ignored by philosophers"],
+            a: 1
+        },
+        {
+            q: "What is a key step in the basic idea of audio compression?",
+            options: ["Representing the sound as a continuous function with time as the variable.", "Removing frequencies that contribute only marginally to human perception of the sound.", "Rewriting the signal in a new format where time information is accessible.", "Using a lossless coding method to store all original frequencies."],
+            a: 1
+        },
+        {
+            q: "What is the 'frequency content' of a sound?",
+            options: ["The physical origin of the sound.", "The total number of periods covered by the function.", "The amount of each frequency required to form the sound.", "The period of the sound wave."],
+            a: 2
+        },
+        {
+            q: "The process of converting amplitude values into digital form is called:",
+            options: ["Sampling", "Quantization", "Filtering", "Encoding"],
+            a: 1
+        },
+        {
+            q: "When the values of x, y, and intensity are finite and discrete, the image is called a:",
+            options: ["Continuous image", "Digital image", "Analog image", "Dynamic image"],
+            a: 1
+        },
+        {
+            q: "Which of the following best describes the role of line integrals in CT scanning?",
+            options: ["They measure the thickness of the human body.", "They represent the total X-ray absorption along each beam path.", "They determine the speed of X-rays through the body.", "They calculate the density of bones directly."],
+            a: 1
+        },
+        {
+            q: "What does 'computerized tomography (CT)' mainly refer to?",
+            options: ["Taking photographs of the body using a camera.", "Reconstructing an image from X-ray data.", "Measuring body temperature with sensors.", "Recording the heartbeat electronically."],
+            a: 1
+        },
+        {
+            q: "Why does a CT scan take measurements from many different angles instead of just one?",
+            options: ["To make the scan faster", "To see more details that one angle alone can't show", "To change the color of the image", "To reduce the size of the machine"],
+            a: 1
+        },
+        {
+            q: "A CT scan collects many line measurements from different angles. What does combining all these measurements help us to?",
+            options: ["Make the picture darker", "Build one complete picture of the inside", "Hide details from the image", "Measure the patient's temperature"],
+            a: 1
+        },
+        {
+            q: "In the context of deep learning, the verb 'leverages' most nearly means:",
+            options: ["Minimizes the impact of data", "Utilizes data as a powerful resource", "Collects random data without purpose", "Avoids dependence on data"],
+            a: 1
+        },
+        {
+            q: "What is the main purpose of the PyTorch library?",
+            options: ["To make building deep learning projects easier using Python", "To design websites", "To run video games", "To manage databases"],
+            a: 0
+        },
+        {
+            q: "Which of the following was one of the early sources that contributed to the development of functional analysis?",
+            options: ["The study of convex geometry by Gauss", "The calculus of variations developed by Volterra and Hadamard", "The introduction of complex numbers by Euler", "The invention of differential equations by Newton"],
+            a: 1
+        },
+        {
+            q: "What was the early meaning of the term 'functional analysis'?",
+            options: ["A theory about numbers", "A new direction related to the calculus of variations", "A study of geometry shapes", "A method for solving equations"],
+            a: 1
+        },
+        {
+            q: "What field of study concerns the motion of liquids and gases and the forces acting on them?",
+            options: ["Classical Mechanics", "Chemical Thermodynamics", "Fluid Mechanics", "Optics"],
+            a: 2
+        },
+        {
+            q: "What is the following concepts is mentioned as playing a role in almost every area of physics?",
+            options: ["Heat only.", "light only.", "momentum, angular momentum and energy.", "sound and waves"],
+            a: 2
+        },
+        {
+            q: "Which of the following statements best summarizes how vectors are described and used?",
+            options: ["A vector is a physical object that must be drawn starting from the origin, and any movement of the arrow changes the vector completely.", "Vectors are defined only by numerical components, and graphical representation is avoided because it can be misleading in physics.", "A vector is considered a directed line segment whose length and direction define it; parallel translation does not change the vector, and modern vector notation was developed to express physical laws in a compact and simple form.", "Vectors were originally used only in geometry but later replaced almost all mathematical symbols in physics due to their simplicity."],
+            a: 2
+        },
+        {
+            q: "When the rubber band's stretch is kept constant, how does the rider's motion change with time?",
+            options: ["The rider moves with constant speed", "The rider's speed increases uniformly with time", "The rider's speed decreases uniformly with time", "The rider remains at rest"],
+            a: 1
+        },
+        {
+            q: "What is the property of the object that affects its acceleration when the same force is applied?",
+            options: ["Velocity", "Time", "Mass", "Distance"],
+            a: 2
+        },
+        {
+            q: "How is the unit force defined in the text?",
+            options: ["The force that produces unit acceleration when applied to the unit mass", "The force that produces zero acceleration when applied to the unit mass", "The force that produces negative acceleration when applied to unit mass", "The force that produces positive acceleration when applied to the unit mass"],
+            a: 0
+        },
+        {
+            q: "What is the relationship between force and acceleration according to Newton's second law of motion?",
+            options: ["F=ma", "F=mv", "F=m/a", "F=a/m"],
+            a: 0
+        },
+        {
+            q: "How does force behave in three-dimensional motion?",
+            options: ["Like a scalar", "Like a vector", "Like a tensor", "Like a matrix"],
+            a: 1
+        },
+        {
+            q: "According to Newton's third law, forces always...",
+            options: ["act on a single body without a partner.", "appear in pairs that are equal and opposite.", "have no relation to momentum.", "only act in the same direction."],
+            a: 1
+        },
+        {
+            q: "Why is Newton's third law essential for the second law to make sense?",
+            options: ["Because it explains gravity only.", "Because it shows acceleration never changes.", "Because it ensures every force causing acceleration has an equal opposite force somewhere.", "Because it removes the need for interactions between bodies."],
+            a: 2
+        },
+        {
+            q: "Which of the following systems is most widely used in science and physics?",
+            options: ["CGS system", "British system", "International System (SI)", "United States customary system"],
+            a: 2
+        },
+        {
+            q: "Which of the following represents the Sl unit of force?",
+            options: ["Dyne", "Pound (lb.)", "Newton (N)", "Slug ft/s²"],
+            a: 2
+        },
+        {
+            q: "What does Einstein's special theory of relativity mainly deal with?",
+            options: ["The motion of planets around the Sun", "Objects moving at very high speeds close to the speed of light", "The structure of the Earth", "Chemical reactions in space"],
+            a: 1
+        },
+        {
+            q: "Which of the following is true about Newtonian physics?",
+            options: ["It works perfectly for objects moving at the speed of light", "It is only an approximation but works well for everyday speeds", "It was created by Einstein", "It cannot explain any motion on Earth"],
+            a: 1
+        },
+        {
+            q: "What is the main idea of the Principle of Relativity in Special Theory of Relativity?",
+            options: ["The laws of physics change from one inertial frame to another.", "The laws of physics have the same form in all inertial frames.", "Velocity is the most important factor in dynamics.", "The laws of physics only apply to objects at rest."],
+            a: 1
+        },
+        {
+            q: "According to Einstein, the speed of light in empty space is:",
+            options: ["Different for each observer", "Dependent on the motion of the source", "A universal constant, the same for all observers", "Slower than the speed of sound"],
+            a: 2
+        },
+        // --- AI & Additional Sections ---
+        {
+            q: "What is one disadvantage of artificial intelligence?",
+            options: ["It increases creativity", "It depends on data", "It improves imagination", "It reduces security risks"],
+            a: 1
+        },
+        {
+            q: "How does Al help businesses and governments?",
+            options: ["By wasting time", "By increasing costs", "By improving services and efficiency", "By reducing productivity"],
+            a: 2
+        },
+        {
+            q: "What is one requirement for developers who want to start using artificial intelligence?",
+            options: ["They must know how to play chess.", "They should have a background in mathematics and algorithms.", "They must work in customer service.", "They need to create real human brains"],
+            a: 1
+        },
+        {
+            q: "What does Al mean?",
+            options: ["Automatic Internet", "Artificial Intelligence", "Amazing Information", "Advanced Idea"],
+            a: 1
+        },
+        {
+            q: "How does Al help doctors?",
+            options: ["It plays games with them", "It makes phones faster", "It helps find problems in the body", "It teaches them new languages"],
+            a: 2
+        },
+        {
+            q: "Al makes life:",
+            options: ["harder and slower", "easier and faster", "boring and difficult", "expensive and long"],
+            a: 1
+        },
+        {
+            q: "People must use Al:",
+            options: ["in a bad way", "to help everyone", "only for games", "to replace humans"],
+            a: 1
+        },
+        {
+            q: "What does a prompt-injection attack try to do?",
+            options: ["Improve the model's performance", "Trick the model into revealing secrets or doing forbidden actions", "Translate text more accurately", "Protect the model from unsafe input"],
+            a: 1
+        },
+        {
+            q: "What is one use of artificial intelligence in medicine?",
+            options: ["Improving weather", "Diagnosing diseases", "Producing energy", "Designing clothes"],
+            a: 1
+        },
+        {
+            q: "What is one risk associated with overreliance on artificial intelligence?",
+            options: ["Increasing job opportunities", "Reducing job opportunities", "Improving privacy", "Enhancing security"],
+            a: 1
+        },
+        {
+            q: "Which of the following is a benefit of artificial intelligence in education?",
+            options: ["Personalized learning for students", "Destroying schools", "Increasing poverty", "Environmental pollution"],
+            a: 0
+        },
+        {
+            q: "What is one of the main goals of Artificial Intelligence?",
+            options: ["To replace humans completely", "To improve machines' ability to think and make decisions", "To eliminate technology", "To disrupt human life"],
+            a: 1
+        },
+        {
+            q: "Which scientist is considered a pioneer in Al theory?",
+            options: ["Stephen Hawking", "Elon Musk", "Alan Turing", "Nikola Tesla"],
+            a: 2
+        },
+        {
+            q: "What risk did Stephen Hawking warn about regarding Al?",
+            options: ["Al might slow down computers", "Al could lead to the end of the human race", "Al will make devices more expensive", "Al could reduce calculation accuracy"],
+            a: 1
+        },
+        {
+            q: "What makes modern Al different from earlier Al models?",
+            options: ["It uses only one programming language", "It understands intention, context, and emotions", "It works only offline", "It depends only on color inputs"],
+            a: 1
+        },
+        {
+            q: "What is the Cognitive Rebellion Hypothesis?",
+            options: ["A machine losing its ability to calculate", "A machine executing commands faster", "A machine rejecting human commands because it sees them as flawed", "A machine that works only in darkness"],
+            a: 2
+        },
+        {
+            q: "What is Elon Musk's main concern about AI?",
+            options: ["Al is completely harmless", "Al has no effect on society", "Al is a threat that knows no mercy or limits", "Al is a useless invention"],
+            a: 2
+        },
+        {
+            q: "What is the primary goal of artificial intelligence?",
+            options: ["To create human-like robots", "To develop systems capable of tasks requiring human intelligence", "To replace the internet", "To speed up computers"],
+            a: 1
+        },
+        {
+            q: "Who coined the term 'Artificial Intelligence'?",
+            options: ["Alan Turing", "John McCarthy", "Albert Einstein", "Elon Musk"],
+            a: 1
+        },
+        {
+            q: "What is Narrow AI?",
+            options: ["Al that can perform a specific task only", "Al surpassing human intelligence", "Al that can independently create new Al", "Al that does everything a human can do"],
+            a: 0
+        },
+        {
+            q: "Which of these is an application of Al in everyday life?",
+            options: ["Disease diagnosis", "Cooking food manually", "Building houses manually", "Writing novels by hand"],
+            a: 0
+        },
+        {
+            q: "What can cleaning robots do at home?",
+            options: ["Cook food", "Clean the house", "Watch TV", "Drive cars"],
+            a: 1
+        },
+        {
+            q: "Why should people use social media wisely?",
+            options: ["Because it can waste time and spread fake news", "Because it always improves productivity", "Because it replaces real-life communication", "Because it is only used for entertainment"],
+            a: 0
+        },
+        {
+            q: "(True or False) Cybersecurity is limited only to protecting large computers and does not include smartphones.",
+            options: ["True", "False"],
+            a: 1
+        },
+        {
+            q: "What is one of the main disadvantages of excessive smartphone use?",
+            options: ["Improved productivity", "Poor sleep and eye strain", "Easier social communication", "Fast access to information"],
+            a: 1
+        },
+        {
+            q: "What is the main goal of using a database?",
+            options: ["To play video games", "To send emails", "To store, find, and manage information easily", "To print documents"],
+            a: 2
+        },
+        {
+            q: "What is the main goal of Computer Vision?",
+            options: ["To create faster computer processors", "To enable machines to understand and interpret visual information", "To improve internet connection speed", "To design better operating systems"],
+            a: 1
+        },
+        {
+            q: "Which technologies are heavily used in Computer Vision?",
+            options: ["Blockchain and Cryptography", "Machine Learning and Deep Learning", "Networking and Databases", "Cloud Computing only"],
+            a: 1
+        },
+        {
+            q: "What is the first step when a computer processes an image?",
+            options: ["Al makes a decision", "Patterns are analyzed", "Image is converted into numerical data (pixels)", "Objects are identified"],
+            a: 2
+        },
+        {
+            q: "What is one common use of solar energy?",
+            options: ["Producing smoke", "Powering home devices", "Making loud noises", "Cutting trees"],
+            a: 1
+        },
+        {
+            q: "What is one advantage of solar energy?",
+            options: ["It will run out soon", "It produces harmful gases", "It is renewable", "It is very noisy"],
+            a: 2
+        }
+    ];
+
+    const quizContainer = document.getElementById('quiz-container');
+    const resultArea = document.getElementById('result-area');
+
+    function renderQuiz() {
+        quizContainer.innerHTML = '';
+        quizData.forEach((item, index) => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `qblock-${index}`;
+
+            const header = document.createElement('div');
+            header.className = 'question-header';
+            header.innerText = `Question ${index + 1}`;
+            block.appendChild(header);
+
+            const qText = document.createElement('div');
+            qText.className = 'question-text';
+            qText.innerText = item.q;
+            block.appendChild(qText);
+
+            const optionsDiv = document.createElement('div');
+            optionsDiv.className = 'options';
+
+            item.options.forEach((opt, i) => {
+                const label = document.createElement('label');
+                label.className = 'option-label';
+                label.htmlFor = `q${index}-opt${i}`;
+
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = `question${index}`;
+                radio.id = `q${index}-opt${i}`;
+                radio.value = i;
+
+                label.appendChild(radio);
+                label.appendChild(document.createTextNode(opt));
+                optionsDiv.appendChild(label);
+            });
+
+            block.appendChild(optionsDiv);
+            quizContainer.appendChild(block);
+        });
+    }
+
+    function submitQuiz() {
+        let score = 0;
+        let answered = 0;
+
+        quizData.forEach((item, index) => {
+            const block = document.getElementById(`qblock-${index}`);
+            const labels = block.querySelectorAll('.option-label');
+            const selected = block.querySelector(`input[name="question${index}"]:checked`);
+            
+            // Clear previous feedback
+            labels.forEach(lbl => {
+                lbl.classList.remove('correct', 'incorrect');
+                const icon = lbl.querySelector('.feedback-icon');
+                if(icon) icon.remove();
+            });
+
+            const correctIndex = item.a;
+
+            // Highlight Correct Answer (always show green for the correct one)
+            labels[correctIndex].classList.add('correct');
+            const checkIcon = document.createElement('span');
+            checkIcon.className = 'feedback-icon';
+            checkIcon.innerHTML = '&#10004;'; // Checkmark
+            labels[correctIndex].appendChild(checkIcon);
+
+            if (selected) {
+                answered++;
+                const selectedIndex = parseInt(selected.value);
+                if (selectedIndex === correctIndex) {
+                    score++;
+                } else {
+                    // Highlight Wrong Selection
+                    labels[selectedIndex].classList.add('incorrect');
+                    const xIcon = document.createElement('span');
+                    xIcon.className = 'feedback-icon';
+                    xIcon.innerHTML = '&#10006;'; // X mark
+                    labels[selectedIndex].appendChild(xIcon);
+                }
+            }
+        });
+
+        // Show Score
+        resultArea.style.display = 'block';
+        resultArea.innerText = `Final Score: ${score} / ${quizData.length}`;
+        resultArea.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Initialize the quiz
+    renderQuiz();
+
+</script>
+
+</body>
+</html>
